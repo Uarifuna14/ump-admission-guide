@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [showLogin, setShowLogin] = useState(false);
+  const [view, setView] = useState('home'); // 'home' or 'auth'
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -17,33 +17,31 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Function to show login screen
+  const showLogin = () => setView('auth');
+  const showHome = () => setView('home');
+
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', color: '#333', margin: 0, padding: 0, backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <Navbar />
+    <div style={{ fontFamily: '"Inter", sans-serif', margin: 0, padding: 0 }}>
+      <Navbar onLoginClick={showLogin} />
       
       {!user ? (
-        // What logged-out users see
-        <>
-          {!showLogin ? (
-            <>
-              <Hero />
-              <div style={{ textAlign: 'center', paddingBottom: '50px' }}>
-                <button onClick={() => setShowLogin(true)} style={{ padding: '15px 30px', backgroundColor: '#003366', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                  Sign In to Save Progress
-                </button>
-              </div>
-            </>
-          ) : (
-            <Auth onLoginSuccess={() => setShowLogin(false)} />
-          )}
-        </>
+        // Visitor View
+        view === 'home' ? (
+          <Hero onStart={showLogin} />
+        ) : (
+          <div style={{ padding: '40px 0' }}>
+             <button onClick={showHome} style={{ marginLeft: '10%', cursor: 'pointer', background: 'none', border: 'none', color: '#003366', textDecoration: 'underline' }}>← Back to Home</button>
+             <Auth onLoginSuccess={() => setView('home')} />
+          </div>
+        )
       ) : (
-        // What logged-in users see
+        // Logged In View
         <Dashboard />
       )}
 
-      <footer style={{ backgroundColor: '#003366', color: 'white', padding: '2rem', textAlign: 'center' }}>
-        <p>&copy; 2026 University of Mpumalanga Career & Admission Guide</p>
+      <footer style={{ backgroundColor: '#001f3f', color: 'white', padding: '40px 10%', textAlign: 'center' }}>
+        <p>&copy; 2026 University of Mpumalanga Career Guide. All Rights Reserved.</p>
       </footer>
     </div>
   );
