@@ -8,7 +8,6 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 
 const Auth = ({ onLoginSuccess }) => {
-  // Modes: 'login', 'signup', 'forgot'
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,20 +21,21 @@ const Auth = ({ onLoginSuccess }) => {
     try {
       if (mode === 'login') {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("Welcome back!");
         onLoginSuccess();
       } 
       else if (mode === 'signup') {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
-        // Save profile to Firestore
+        // This is where the 'users' collection is automatically triggered
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           displayName: name,
           email: email,
-          createdAt: new Date()
+          createdAt: new Date(),
+          role: 'student' // Added a role for future scalability
         });
+        
         alert("Account created! Welcome to UMP Guide.");
         onLoginSuccess();
       } 
@@ -108,10 +108,9 @@ const Auth = ({ onLoginSuccess }) => {
   );
 };
 
-// Styles
 const cardStyle = { maxWidth: '400px', margin: '50px auto', padding: '30px', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
 const inputStyle = { padding: '12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem' };
 const btnStyle = { padding: '12px', backgroundColor: '#003366', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' };
-const linkStyle = { color: '#003366', cursor: 'pointer', textDecoration: 'underline', marginBottom: '10px' };
+const linkStyle = { color: '#003366', cursor: 'pointer', textDecoration: 'underline', marginBottom: '5px' };
 
 export default Auth;
